@@ -1,0 +1,35 @@
+<?php
+
+require_once('GeneratorInterface.php');
+
+class KdfGenerator implements GeneratorInterface
+{
+    private string $state;
+
+    public function init(string $seed, int $iterations): static
+    {
+        $this->state = $seed;
+
+        return $this->stretch($iterations);
+    }
+
+    /**
+     * change to your squeezing recipe
+     */
+    public function squeeze(): string
+    {
+        $this->stretch(1);
+
+        return $this->state;
+    }
+
+    /**
+     * change to your stretching recipe
+     */
+    private function stretch(int $iterations): static
+    {
+        $this->state = hash_pbkdf2('sha3-512', $this->state, '', $iterations, 0, true);
+
+        return $this;
+    }
+}
